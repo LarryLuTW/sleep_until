@@ -17,7 +17,7 @@ fn main() {
     let now = Local::now();
     let begin = NaiveTime::from_hms(now.hour(), now.minute(), now.second());
 
-    println!("From {} to {}", begin, end);
+    println!("Sleep from {} to {}", begin, end);
 
     let dur = end.signed_duration_since(begin).to_std().unwrap();
     thread::sleep(dur);
