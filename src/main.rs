@@ -1,4 +1,5 @@
 use chrono::prelude::*;
+use chrono::Duration;
 use chrono::Local;
 use chrono::NaiveTime;
 use std::env;
@@ -19,6 +20,20 @@ fn main() {
 
     println!("Sleep from {} to {}", begin, end);
 
-    let dur = end.signed_duration_since(begin).to_std().unwrap();
-    thread::sleep(dur);
+    let a_min = Duration::minutes(1);
+    loop {
+        let now = Local::now();
+        let begin = NaiveTime::from_hms(now.hour(), now.minute(), now.second());
+        println!("It's {}:{}:{} now", now.hour(), now.minute(), now.second());
+
+        let dur = end.signed_duration_since(begin);
+        if dur < a_min {
+            thread::sleep(dur.to_std().unwrap());
+            break;
+        }
+
+        thread::sleep(a_min.to_std().unwrap());
+    }
+    let now = Local::now();
+    println!("It's {}:{}:{} now", now.hour(), now.minute(), now.second());
 }
