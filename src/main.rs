@@ -3,37 +3,57 @@ use chrono::Duration;
 use chrono::Local;
 use chrono::NaiveTime;
 use std::env;
+use std::process;
 use std::thread;
 
-fn main() {
+fn get_curr_time() -> NaiveTime {
+    let now = Local::now();
+    return NaiveTime::from_hms(now.hour(), now.minute(), now.second());
+}
+
+fn get_wakeup_time() -> NaiveTime {
     let args: Vec<_> = env::args().collect();
     if args.len() != 2 {
         println!("usage: sleep_until 20:15:00");
-        return;
+        process::exit(1);
     }
 
-    let end_str = &args[1]; // "20:01:00"
-    let end = NaiveTime::parse_from_str(&end_str, "%H:%M:%S").unwrap();
+    // args[1] = "20:01:00"
+    return NaiveTime::parse_from_str(&args[1], "%H:%M:%S").unwrap();
+}
 
-    let now = Local::now();
-    let begin = NaiveTime::from_hms(now.hour(), now.minute(), now.second());
+fn print_curr_time() {
+    println!("It's {} now", get_curr_time());
+}
 
+fn raw_sleep(dur: Duration) {
+    thread::sleep(dur.to_std().unwrap());
+}
+
+fn main() {
+    let begin = get_curr_time();
+    let end = get_wakeup_time();
     println!("Sleep from {} to {}", begin, end);
 
-    let a_min = Duration::minutes(1);
+    let short_dur = Duration::seconds(10);
     loop {
-        let now = Local::now();
-        let begin = NaiveTime::from_hms(now.hour(), now.minute(), now.second());
-        println!("It's {}:{}:{} now", now.hour(), now.minute(), now.second());
+        print_curr_time();
 
+        let begin = get_curr_time();
         let dur = end.signed_duration_since(begin);
-        if dur < a_min {
-            thread::sleep(dur.to_std().unwrap());
+
+        if dur < Duration::zero() {
+            // wake up immediately
             break;
         }
 
-        thread::sleep(a_min.to_std().unwrap());
+        if dur < short_dur {
+            // the last sleep
+            raw_sleep(dur);
+            break;
+        }
+
+        raw_sleep(short_dur);
     }
-    let now = Local::now();
-    println!("It's {}:{}:{} now", now.hour(), now.minute(), now.second());
+    print_curr_time();
 }
