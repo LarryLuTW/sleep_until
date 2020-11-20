@@ -37,8 +37,6 @@ fn main() {
 
     let short_dur = Duration::seconds(10);
     loop {
-        print_curr_time();
-
         let begin = get_curr_time();
         let dur = end.signed_duration_since(begin);
 
