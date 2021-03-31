@@ -1,6 +1,6 @@
 # sleep_until
 
-This CLI tool will wait until the time you specify.
+This CLI tool is written in Rust. It will wait until the time you specify.
 
 ## Install
 
